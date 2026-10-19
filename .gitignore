@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+*.egg-info/
+node_modules/
+frontend/dist/
+data/raw/*
+data/interim/*
+data/processed/*
+!data/**/.gitkeep
+artifacts/models/*
+!artifacts/models/.gitkeep

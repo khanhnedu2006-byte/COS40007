@@ -1,0 +1,12 @@
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #212529; }
+
+.layout { display: flex; height: 100%; }
+.sidebar { width: 320px; padding: 16px; overflow-y: auto; border-right: 1px solid #dee2e6; background: #f8f9fa; }
+.map { flex: 1; height: 100%; cursor: crosshair; }
+
+h1 { font-size: 1.2rem; margin: 0 0 8px; }
+.hint, .credits { font-size: 0.8rem; color: #6c757d; }
+.panel { background: #fff; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; }
+.panel.muted { color: #6c757d; }
