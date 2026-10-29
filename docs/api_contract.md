@@ -7,7 +7,7 @@ Produced by Person 3 (backend), using the bundle saved by Person 2 (notebook 06)
 
 ## GET /api/towers
 ```json
-[{"radio": "NR", "latitude": 21.0285, "longitude": 105.8542}, ...]
+[{"tower_id": 1, "latitude": 21.0285, "longitude": 105.8542}, ...]
 ```
 
 ## GET /api/predict?lat=21.0285&lon=105.8542
@@ -19,7 +19,7 @@ Produced by Person 3 (backend), using the bundle saved by Person 2 (notebook 06)
   "quality_level": "Good",
   "theory_mbps": 223.0, "local_effect_mbps": -90.0,
   "nearest_towers": [
-    {"radio": "NR", "operator": 4, "latitude": 21.03, "longitude": 105.85, "distance_m": 400}
+    {"tower_id": 1, "latitude": 21.03, "longitude": 105.85, "distance_m": 400}
   ]
 }
 ```

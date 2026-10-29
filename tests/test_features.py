@@ -7,8 +7,7 @@ from speedmap.features.spatial import TowerIndex
 from speedmap.features.tower_features import tower_features
 
 TOWERS = pd.DataFrame({
-    "radio": ["NR", "LTE", "LTE"],
-    "operator": [1, 2, 4],
+    "tower_id": [1, 2, 3],
     "latitude": [21.0285, 21.0300, 21.1000],
     "longitude": [105.8542, 105.8560, 105.9000],
 })
@@ -25,6 +24,8 @@ def test_nearest_distance_is_small_next_to_tower():
     assert feats["dist_nearest_tower_m"].iloc[0] < 5
 
 
-def test_far_point_uses_search_radius():
+def test_far_point_keeps_true_distance():
+    # Điểm ở ngoại thành: khoảng cách thật (> bán kính tìm kiếm), không có trạm trong 1 km
     feats = tower_features(np.array([20.6]), np.array([105.3]), TowerIndex(TOWERS))
-    assert feats["dist_nearest_tower_m"].iloc[0] == config.TOWER_SEARCH_RADIUS_M
+    assert feats["dist_nearest_tower_m"].iloc[0] > config.TOWER_SEARCH_RADIUS_M
+    assert feats["towers_1km"].iloc[0] == 0

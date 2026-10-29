@@ -14,13 +14,14 @@ One row = one Ookla tile (about 610 m) in one quarter.
 | download_mbps | float | **target** |
 | upload_mbps, latency_ms | float | secondary targets |
 | tests, devices | int | number of tests / devices in the tile |
-| dist_nearest_tower_m | float | metres; = search radius (3000) if no tower nearby |
-| dist_nearest_nr_m | float | metres to nearest 5G tower; = 3000 if none |
-| towers_500m, towers_1km | int | number of towers (4G + 5G) within the radius |
-| nr_share_1km | float | share of 5G towers within 1 km (0 to 1) |
-| theory_mbps | float | 3GPP theoretical speed |
+| dist_nearest_tower_m | float | metres to the nearest tower (4G and 5G merged), not capped |
+| towers_500m, towers_1km | int | number of towers within the radius |
+| theory_mbps | float | 3GPP theoretical speed; empty until the physics module (T-06) is finished, then rebuild the table |
 | sample_weight | float | training weight, e.g. sqrt(tests) |
 | block_id | int | 2 km block, used as CV groups |
 | quality_level | str | Poor / Fair / Good / Excellent from download_mbps |
 
 Model input = `config.FEATURE_COLUMNS`.
+
+Rebuild everything from the raw files: `python scripts/run_pipeline.py --step towers` then `--step features`.
+Current version (28 Oct 2026): 30,076 rows, 10,459 tiles, 6 quarters (2024-4 to 2026-1), 2,311 towers, 1,665 CV blocks.

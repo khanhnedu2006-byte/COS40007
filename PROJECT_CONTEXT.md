@@ -73,13 +73,15 @@ People in Hanoi cannot see what mobile internet speed to expect at a place befor
 - **The data may be out of date.** Ookla Speedtest Global Index reports Hanoi's median mobile download at **493 Mbps in August 2026** (Vietnam 206 Mbps in July 2026, 220 Mbps in August 2026; world 109 Mbps). Re-run the fetch script with newer quarters:
   `python ml/fetch_ookla_hanoi.py --quarters 2024-4 2025-1 2025-2 2025-3 2025-4 2026-1 2026-2 2026-3` (missing quarters are skipped).
 
-### 4.2 OpenCelliD (tower locations), NOT YET DOWNLOADED
+### 4.2 OpenCelliD (tower locations), DOWNLOADED 28 Oct 2026
 
 - Global crowdsourced cell tower database, licence **CC BY-SA 4.0**. Fields include `radio` (LTE, NR = 5G, ...), `mcc`, `net` (operator), `area`, `cell`, `lon`, `lat`, `range`, `samples`.
 - Needs a free account token on opencellid.org; download the Vietnam file (**MCC 452**) and put it in `data/raw/`.
 - Tower positions are estimated from phone reports and can be off by a few hundred metres.
-- Keep LTE and NR towers inside the Hanoi box; drop towers with fewer than 2 samples.
-- **First check after download:** how many LTE and NR towers fall inside Hanoi.
+- Keep LTE and NR cells inside the Hanoi box; drop cells with fewer than 2 samples; merge cells within ~100 m (coordinates rounded to 3 decimals) into one **tower**. Output: `data/interim/hanoi_towers.csv` (tower_id, latitude, longitude, cells, operators, samples).
+- **Result of the first check (decision, 28 Oct 2026):** Vietnam file has 16,630 cells; inside Hanoi 3,307 LTE and only 7 NR cells (5G mostly shares 4G sites and is reported as LTE) → **4G and 5G are merged into one "tower" type**; no 5G-specific features. 3,314 cells → 2,311 towers.
+- Coverage: towers are dense in the centre (median 282 m to nearest tower within 5 km of Hoan Kiem) and sparse in the suburbs (8.7 km beyond 20 km). The team keeps **all tiles**, because the network outside the centre is also slower in reality; `dist_nearest_tower_m` is therefore not capped. Mention the sparse suburban tower data as a limitation.
+- Ookla raw CSV: `quadkey` was damaged by Excel (1.3221E+15); `ookla.load_raw()` rebuilds it from the tile centre (zoom 16). Do not save the CSV with Excel.
 
 ### 4.3 OpenStreetMap (optional features, map background)
 
@@ -91,9 +93,8 @@ People in Hanoi cannot see what mobile internet speed to expect at a place befor
 | Feature | Source |
 |---|---|
 | `latitude`, `longitude` | Ookla |
-| distance to nearest tower (any) | OpenCelliD |
+| distance to nearest tower (4G/5G merged, not capped) | OpenCelliD |
 | number of towers within 500 m and 1 km | OpenCelliD |
-| share of 5G (NR) towers nearby | OpenCelliD |
 | building density, road density, land use (optional) | OSM |
 | `devices` | Ookla |
 | `quarter` | Ookla |
@@ -127,11 +128,9 @@ Step 3  Conformal prediction (MAPIE) → 80% confidence range
 - Received power = transmit power − path loss. Serving tower = nearest tower; all other nearby towers count as interference, plus thermal noise (−174 dBm/Hz + 10·log10(bandwidth) + noise figure ≈ 7 dB).
 - Theoretical speed = bandwidth × log2(1 + SINR).
 - Assumed settings (not public, so typical values are used; XGBoost corrects the error):
-  - 5G (NR): 3.5 GHz, 100 MHz, about 46 dBm transmit power
-  - 4G (LTE): 1.8 GHz, 20 MHz
-  - Compute both and keep the faster one for each tile.
+  - One setting for every tower (4G and 5G merged): 3.5 GHz, 100 MHz, about 46 dBm transmit power (`config.TOWER_PHYSICS`).
 
-**Worked example:** nearest tower 400 m, another tower 800 m, 5G settings → path loss ≈ 126 dB, signal ≈ −80 dBm, interference + noise ≈ −86 dBm, SINR ≈ 6 dB → theoretical ≈ 223 Mbps. If Ookla measures 130 Mbps, the correction XGBoost must learn is −93 Mbps.
+**Worked example:** nearest tower 400 m, another tower 800 m → path loss ≈ 126 dB, signal ≈ −80 dBm, interference + noise ≈ −86 dBm, SINR ≈ 6 dB → theoretical ≈ 223 Mbps. If Ookla measures 130 Mbps, the correction XGBoost must learn is −93 Mbps.
 
 **Step 2 details**
 - Inputs: the features in Section 5, including the theoretical speed.
@@ -183,7 +182,7 @@ FastAPI  GET /predict?lat=&lon=
 Popup: "Estimate 133 Mbps (95–170) · Good · Theoretical 223, local effect −90 · nearest tower 400 m"
 ```
 
-- Map shows **4G and 5G towers as nodes** (real-world data from OpenCelliD), different colours, clustered when zoomed out.
+- Map shows **towers (4G/5G merged) as nodes** (real-world data from OpenCelliD), one colour, clustered when zoomed out.
 - Recommended UX: on click, draw lines to the 3 nearest towers with distances; optional heatmap of predicted speed; a toggle to show all towers.
 - Credit Ookla, OpenCelliD and OpenStreetMap on the page.
 
@@ -255,7 +254,7 @@ This split is a proposal; confirm within the team.
 
 ## 14. Next Steps
 
-1. Register on OpenCelliD, download Vietnam (MCC 452), count LTE and NR towers in Hanoi. **This decides whether the tower-based design works.**
+1. ~~Download OpenCelliD and count towers~~ DONE: 2,311 merged towers in Hanoi (see 4.2).
 2. Re-run the Ookla script with newer quarters (2026-2, 2026-3) if available.
 3. Build the feature table `data/processed/hanoi_train.csv` with tower features and `tests` as weight.
 4. Train the baselines, then the hybrid model; compare with spatial CV.

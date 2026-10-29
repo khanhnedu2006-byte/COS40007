@@ -6,7 +6,7 @@ and set quarter_index to the latest quarter stored in the bundle.
 
 Output keys (docs/api_contract.md):
     latitude, longitude, download_mbps, download_low, download_high, upload_mbps, latency_ms,
-    quality_level, theory_mbps, local_effect_mbps, nearest_towers[{radio, operator, latitude, longitude, distance_m}]
+    quality_level, theory_mbps, local_effect_mbps, nearest_towers[{tower_id, latitude, longitude, distance_m}]
 """
 from speedmap import config
 
@@ -21,6 +21,6 @@ class Predictor:
         raise NotImplementedError
 
     def tower_list(self) -> list:
-        """[{radio, latitude, longitude}, ...] for the map nodes."""
+        """[{tower_id, latitude, longitude}, ...] for the map nodes."""
         # TODO
         raise NotImplementedError

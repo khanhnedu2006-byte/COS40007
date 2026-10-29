@@ -27,17 +27,16 @@ RANDOM_SEED = 42
 MAX_LATENCY_MS = 500
 MIN_TESTS_FOR_EVAL = 3
 MIN_TOWER_SAMPLES = 2
-TOWER_RADIOS = ("LTE", "NR")
+TOWER_RADIOS = ("LTE", "NR")  # 4G và 5G gộp chung thành "trạm"
+TOWER_MERGE_DECIMALS = 3  # làm tròn toạ độ (~100 m) để gộp các cell thành một trạm
 
 # Đặc trưng trạm
 TOWER_SEARCH_RADIUS_M = 3000
 NEAREST_TOWERS_IN_POPUP = 3
 
 # Giả định cho mô hình 3GPP (nhà mạng không công bố, dùng giá trị điển hình)
-PHYSICS = {
-    "NR": {"freq_ghz": 3.5, "bandwidth_mhz": 100, "tx_power_dbm": 46},
-    "LTE": {"freq_ghz": 1.8, "bandwidth_mhz": 20, "tx_power_dbm": 46},
-}
+# Một cấu hình chung cho mọi trạm 4G/5G (trạm hiện đại có 5G 3.5 GHz)
+TOWER_PHYSICS = {"freq_ghz": 3.5, "bandwidth_mhz": 100, "tx_power_dbm": 46}
 UE_HEIGHT_M = 1.5
 NOISE_FIGURE_DB = 7
 MIN_DISTANCE_M = 10
@@ -61,10 +60,8 @@ FEATURE_COLUMNS = [
     "latitude",
     "longitude",
     "dist_nearest_tower_m",
-    "dist_nearest_nr_m",
     "towers_500m",
     "towers_1km",
-    "nr_share_1km",
     "theory_mbps",
     "quarter_index",
 ]

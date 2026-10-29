@@ -11,7 +11,7 @@ Group project/
 │   ├── artifacts.py              save_model / load_model / list_runs   (ready to use)
 │   ├── data/
 │   │   ├── ookla.py              load + clean Ookla tiles                     P1
-│   │   ├── towers.py             OpenCelliD -> Hanoi 4G/5G towers             P1
+│   │   ├── towers.py             OpenCelliD -> Hanoi towers (4G+5G)            P1
 │   │   └── osm.py                OPTIONAL OpenStreetMap features              P1
 │   ├── features/
 │   │   ├── spatial.py            TowerIndex (BallTree), spatial blocks        P1

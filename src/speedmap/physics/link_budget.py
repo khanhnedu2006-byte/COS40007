@@ -5,7 +5,7 @@
     SINR     = nearest tower power / (other towers' power + noise)     (add in mW, not dBm)
     speed    = bandwidth_MHz * min(log2(1 + SINR), MAX_SPECTRAL_EFFICIENCY)
 
-Check: NR towers at 400 m and 800 m -> about 222.9 Mbps (see tests/test_physics.py).
+Check: towers at 400 m and 800 m -> about 222.9 Mbps (see tests/test_physics.py).
 """
 import numpy as np
 
@@ -21,13 +21,7 @@ def noise_dbm(bandwidth_mhz: float) -> float:
     raise NotImplementedError
 
 
-def theoretical_speed_mbps(distances_m: np.ndarray, radio: str) -> float:
-    """Theoretical speed at one point from distances to towers of one technology; 0 if no tower."""
-    # TODO: dùng config.PHYSICS[radio]
-    raise NotImplementedError
-
-
-def best_theoretical_speed(distances_by_radio: dict) -> float:
-    """Max of the theoretical speeds over technologies, e.g. {"NR": array, "LTE": array}."""
-    # TODO
+def theoretical_speed_mbps(distances_m: np.ndarray) -> float:
+    """Theoretical speed at one point from the distances to nearby towers; 0 if no tower."""
+    # TODO: dùng config.TOWER_PHYSICS
     raise NotImplementedError
