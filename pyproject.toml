@@ -7,6 +7,19 @@ name = "speedmap"
 version = "0.1.0"
 description = "Mobile internet speed prediction for Hanoi (COS40007)"
 requires-python = ">=3.10"
+dependencies = [
+    "duckdb>=1.5.6",
+    "fastapi>=0.156.8",
+    "joblib>=1.6.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.9",
+    "numpy>=2.2.6",
+    "pandas>=2.3.3",
+    "pytest>=9.1.1",
+    "scikit-learn>=1.7.2",
+    "uvicorn>=0.54.0",
+    "xgboost>=3.2.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
