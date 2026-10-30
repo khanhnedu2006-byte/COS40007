@@ -1,9 +1,10 @@
-pandas
+tensorflow
 numpy
+matplotlib
+pandas
 scikit-learn
 xgboost
 joblib
-matplotlib
 duckdb
 fastapi
 uvicorn

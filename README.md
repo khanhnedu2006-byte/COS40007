@@ -118,3 +118,10 @@ pytest                       # all
 pytest tests/test_physics.py # one file
 ```
 `test_artifacts.py` passes already; the others pass once the TODOs are written.
+
+## CI pipeline (Group Task 2)
+
+`.github/workflows/train.yml` runs on every push / pull request to `main` and on manual trigger (Actions → Train ML Model → Run workflow):
+checkout → set up Python 3.11 → cache pip → `pip install -r requirements.txt` → `python model.py` → upload `model_results.png` and `metrics.txt` as the artefact **model-results**.
+
+`model.py` trains a small TensorFlow neural network on `data/ci/hanoi_train.csv` (a snapshot of `data/processed/hanoi_train.csv`; refresh it after rebuilding the data).
