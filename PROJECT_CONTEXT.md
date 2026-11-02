@@ -83,6 +83,12 @@ People in Hanoi cannot see what mobile internet speed to expect at a place befor
 - Coverage: towers are dense in the centre (median 282 m to nearest tower within 5 km of Hoan Kiem) and sparse in the suburbs (8.7 km beyond 20 km). The team keeps **all tiles**, because the network outside the centre is also slower in reality; `dist_nearest_tower_m` is therefore not capped. Mention the sparse suburban tower data as a limitation.
 - Ookla raw CSV: `quadkey` was damaged by Excel (1.3221E+15); `ookla.load_raw()` rebuilds it from the tile centre (zoom 16). Do not save the CSV with Excel.
 
+### 4.2b Data decisions, 2 Nov 2026
+- Study area = **Hanoi administrative boundary** (`data/reference/hanoi_boundary.geojson`, geoBoundaries CC BY 4.0), not the bounding box: 40% of the old rows were in neighbouring provinces. Towers are kept up to 5 km outside the border. The backend uses the same polygon to reject clicks.
+- New table `data/processed/hanoi_tiles.csv`: one row per tile, speeds pooled over the latest 4 quarters (test-weighted log mean), with `reliability` (low/medium/high by tests). Recommended training table; inside Hanoi, tower features correlate better with speed (towers within 1 km: Spearman 0.43 on tiles with >= 10 tests).
+- OpenCelliD positions cluster along main roads (crowdsourced), so they are "estimated cell locations", not official sites. `scripts/fetch_osm_towers.py` (run locally) downloads OSM telecom masts to fill gaps.
+- Ookla bounding box widened to lon 106.08 (Hanoi reaches 106.07); re-run `scripts/fetch_ookla_hanoi.py` locally to get the missing east strip and quarters 2026-2/2026-3.
+
 ### 4.3 OpenStreetMap (optional features, map background)
 
 - Building density, road density, land use around each tile, via Overpass API. Precompute per tile once; never call Overpass per click.

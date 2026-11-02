@@ -17,23 +17,27 @@ from speedmap import config  # noqa: E402
 def run_towers():
     from speedmap.data import towers
 
-    hanoi = towers.filter_hanoi(towers.load_opencellid())
+    hanoi = towers.add_osm_masts(towers.filter_hanoi(towers.load_opencellid()), towers.load_osm_masts())
     config.TOWERS_FILE.parent.mkdir(parents=True, exist_ok=True)
     hanoi.to_csv(config.TOWERS_FILE, index=False)
-    print(f"{len(hanoi):,} towers -> {config.TOWERS_FILE}")
+    print(f"{len(hanoi):,} towers -> {config.TOWERS_FILE}  {hanoi['source'].value_counts().to_dict()}")
 
 
 def run_features():
     from speedmap.data import ookla, towers
-    from speedmap.features.build import build_training_table
+    from speedmap.features.build import build_tile_table, build_training_table
 
     clean = ookla.clean(ookla.load_raw())
     config.OOKLA_CLEAN_FILE.parent.mkdir(parents=True, exist_ok=True)
     clean.to_csv(config.OOKLA_CLEAN_FILE, index=False)
-    train = build_training_table(clean, towers.load_towers())
+    hanoi_towers = towers.load_towers()
     config.TRAIN_FILE.parent.mkdir(parents=True, exist_ok=True)
+    train = build_training_table(clean, hanoi_towers)
     train.to_csv(config.TRAIN_FILE, index=False)
     print(f"{len(train):,} rows -> {config.TRAIN_FILE}")
+    tiles = build_tile_table(clean, hanoi_towers)
+    tiles.to_csv(config.TILES_FILE, index=False)
+    print(f"{len(tiles):,} tiles -> {config.TILES_FILE}")
 
 
 def run_baselines():

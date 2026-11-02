@@ -13,12 +13,15 @@ ARTIFACTS_REPORTS = ROOT / "artifacts" / "reports"
 # File dữ liệu
 OOKLA_RAW_FILE = DATA_RAW / "ookla_hanoi_mobile.csv"
 OPENCELLID_RAW_FILE = DATA_RAW / "452.csv.gz"
+OSM_TOWERS_RAW_FILE = DATA_RAW / "osm_comm_towers.csv"
 OOKLA_CLEAN_FILE = DATA_INTERIM / "ookla_clean.csv"
 TOWERS_FILE = DATA_INTERIM / "hanoi_towers.csv"
 TRAIN_FILE = DATA_PROCESSED / "hanoi_train.csv"
+TILES_FILE = DATA_PROCESSED / "hanoi_tiles.csv"
+HANOI_BOUNDARY_FILE = ROOT / "data" / "reference" / "hanoi_boundary.geojson"
 
-# Khu vực Hà Nội (gần đúng)
-HANOI_BBOX = {"lat_min": 20.53, "lat_max": 21.40, "lon_min": 105.28, "lon_max": 106.03}
+# Khu vực Hà Nội: khung bao để lọc nhanh, ranh giới thật nằm trong HANOI_BOUNDARY_FILE
+HANOI_BBOX = {"lat_min": 20.54, "lat_max": 21.41, "lon_min": 105.35, "lon_max": 106.08}
 HANOI_CENTER = (21.0285, 105.8542)
 
 RANDOM_SEED = 42
@@ -27,15 +30,21 @@ RANDOM_SEED = 42
 MAX_LATENCY_MS = 500
 MIN_TESTS_FOR_EVAL = 3
 MIN_TOWER_SAMPLES = 2
-TOWER_RADIOS = ("LTE", "NR")  # 4G và 5G gộp chung thành "trạm"
-TOWER_MERGE_DECIMALS = 3  # làm tròn toạ độ (~100 m) để gộp các cell thành một trạm
+TOWER_RADIOS = ("LTE", "NR")  # cell di động hiện đại, gộp chung thành "trạm"; không phân biệt công nghệ
+TOWER_MERGE_DECIMALS = 3
+TOWER_BUFFER_KM = 5
+OSM_MIN_GAP_M = 200  # chỉ thêm cột OSM cách trạm OpenCelliD gần nhất trên 200 m (tránh trùng)  # giữ cả trạm ngoài ranh giới nhưng cách biên dưới 5 km
+
+# Bảng mỗi ô một dòng (hanoi_tiles.csv)
+POOL_QUARTERS = 4  # gộp các quý gần nhất để giảm nhiễu
+RELIABILITY_LEVELS = [(3, "low"), (10, "medium"), (float("inf"), "high")]  # theo tổng số test của ô  # làm tròn toạ độ (~100 m) để gộp các cell thành một trạm
 
 # Đặc trưng trạm
 TOWER_SEARCH_RADIUS_M = 3000
 NEAREST_TOWERS_IN_POPUP = 3
 
 # Giả định cho mô hình 3GPP (nhà mạng không công bố, dùng giá trị điển hình)
-# Một cấu hình chung cho mọi trạm 4G/5G (trạm hiện đại có 5G 3.5 GHz)
+# Một cấu hình chung cho mọi trạm (giá trị điển hình của trạm hiện đại)
 TOWER_PHYSICS = {"freq_ghz": 3.5, "bandwidth_mhz": 100, "tx_power_dbm": 46}
 UE_HEIGHT_M = 1.5
 NOISE_FIGURE_DB = 7
@@ -75,5 +84,7 @@ def quality_level(download_mbps: float) -> str:
 
 
 def inside_hanoi(lat: float, lon: float) -> bool:
-    b = HANOI_BBOX
-    return b["lat_min"] <= lat <= b["lat_max"] and b["lon_min"] <= lon <= b["lon_max"]
+    """True if the point is inside the Hanoi administrative boundary."""
+    from speedmap.data.boundary import contains
+
+    return bool(contains(lat, lon)[0])

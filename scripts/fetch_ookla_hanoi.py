@@ -5,8 +5,8 @@ keeping only tiles inside the Hanoi bounding box, so the full global file is nev
 
 Usage:
     pip install duckdb pandas
-    python ml/fetch_ookla_hanoi.py
-    python ml/fetch_ookla_hanoi.py --quarters 2025-4 2026-1 --out data/raw/ookla_hanoi_mobile.csv
+    python scripts/fetch_ookla_hanoi.py
+    python scripts/fetch_ookla_hanoi.py --quarters 2025-4 2026-1 --out data/raw/ookla_hanoi_mobile.csv
 """
 import argparse
 import math
@@ -15,10 +15,10 @@ from pathlib import Path
 import duckdb
 import pandas as pd
 
-# Khung bao gần đúng toàn thành phố Hà Nội (gồm cả ngoại thành)
-HANOI_BBOX = {"lat_min": 20.53, "lat_max": 21.40, "lon_min": 105.28, "lon_max": 106.03}
+# Khung bao ranh giới Hà Nội (giống config.HANOI_BBOX); lọc đúng ranh giới làm ở bước clean
+HANOI_BBOX = {"lat_min": 20.54, "lat_max": 21.41, "lon_min": 105.35, "lon_max": 106.08}
 
-DEFAULT_QUARTERS = ["2024-4", "2025-1", "2025-2", "2025-3", "2025-4", "2026-1"]
+DEFAULT_QUARTERS = ["2024-4", "2025-1", "2025-2", "2025-3", "2025-4", "2026-1", "2026-2", "2026-3"]
 BASE_URL = "https://ookla-open-data.s3.amazonaws.com/parquet/performance/type={kind}/year={year}/quarter={q}/{date}_performance_{kind}_tiles.parquet"
 TILE_ZOOM = 16
 PREFIX_ZOOM = 10

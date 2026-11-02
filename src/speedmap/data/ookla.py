@@ -8,6 +8,7 @@ import math
 import pandas as pd
 
 from speedmap import config
+from speedmap.data import boundary
 
 TILE_ZOOM = 16  # ô Ookla là tile zoom 16 (khoảng 610 m)
 
@@ -46,6 +47,7 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     """Return a cleaned copy.
 
     Rules (values in config):
+    - keep only tiles inside the Hanoi administrative boundary
     - drop rows with missing download, latitude or longitude, or download <= 0
     - drop latency > MAX_LATENCY_MS
     - drop extreme download (above the 99.5th percentile) in tiles with tests < MIN_TESTS_FOR_EVAL
@@ -53,6 +55,7 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     """
     out = df.dropna(subset=["download_mbps", "latitude", "longitude"]).copy()
     out = out[out["download_mbps"] > 0]
+    out = out[boundary.contains(out["latitude"].to_numpy(), out["longitude"].to_numpy())]
     out = out[out["latency_ms"].isna() | (out["latency_ms"] <= config.MAX_LATENCY_MS)]
     # Ô có ít test dễ nhiễu: bỏ giá trị download cực lớn ở các ô này
     limit = out["download_mbps"].quantile(0.995)
